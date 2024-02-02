@@ -1,0 +1,26 @@
+/*
+
+- Display number of products per category.
+
+db.products.aggregate([
+  {
+    $group: {
+       _id: "$category",
+       count: { $count: { } }
+    }
+  }
+])
+---------------------------------------------------------------------
+- Display max category products price.
+
+db.products.aggregate([
+  {
+    $group: {
+       _id: "$category",
+       count: { $count: { } },
+       maxQuantity: { $max: "$price" }
+    }
+  }
+])
+
+*/
