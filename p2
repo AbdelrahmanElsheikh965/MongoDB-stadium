@@ -1,0 +1,53 @@
+/*
+
+- Using [$project] 
+        [$addFields] with operator expressions such as 
+        ($getField, $first, $concat, $dateToString, $arrayElemAt etc).
+        
+- Using $unwind.
+
+*/
+
+db.books.find({}, {})
+
+// db.books.aggregate([
+// 
+//   { $sort: {title: 1} },
+//   {
+//    $group:
+//      {
+//        _id: "$title",
+//        firstBook: { $first: "$title" }
+//      }
+//   }
+// ])
+  
+db.books.aggregate([
+
+  {
+    $addFields: {
+      intValue: { $toInt: {$getField: "pageCount"} },
+      multpliedPageCount: { $multiply: ["$pageCount", 2] },
+      testConcat: { $concat: [ "$title", " - ", "$isbn" ] },
+      firstAuthor: { $arrayElemAt: [ "$authors", 0 ] }
+//       yearMonthDayUTC: { $dateToString: { format: "%Y-%m-%d", date: {$getField: "publishedDate"}: {$getField: "date"} } }
+    }
+  },
+  {
+    $project: {
+        _id: 0,
+      intValue: 1,
+      multpliedPageCount: 1,
+      testConcat: 1,
+      firstAuthor: 1
+    }
+  }
+
+])
+  
+  db.books.aggregate([
+     { $unwind : "$authors" },
+     { $limit: 3}
+  ])
+
+
