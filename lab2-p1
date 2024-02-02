@@ -1,0 +1,23 @@
+// use lab2
+// db.books.find({})
+
+// - Running aggregation queries that use multiple stages 
+//      ($match, $group, $count, $skip, $limit, $sortByCount etc). Not Including [lookup] as no relations exist.
+
+
+db.books.aggregate([
+  { $limit: 30 },
+  { $skip: 5 },
+  { $match : { categories : "Java" } },
+  { $group : { _id : "$pageCount"} },
+  { $count: "No Of Results" },
+   
+])
+  
+db.books.aggregate([ 
+    { $sortByCount: "$status" } 
+])
+  
+    
+    
+    
