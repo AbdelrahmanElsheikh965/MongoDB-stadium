@@ -1,0 +1,98 @@
+-------------------------------------------------------------------------
+-> Display user ahmed orders populated with product.
+
+db.users.aggregate([
+  {$match: {name: "ahmed"}},
+  {
+    $lookup: {
+      from: "orders",
+      localField: "_id",
+      foreignField: "userId",
+      as: "userOrders"
+    }
+  },
+  {
+    $unwind: "$userOrders"
+  },
+  {
+    $lookup: {
+      from: "products",
+      localField: "userOrders.productsIds",
+      foreignField: "_id",
+      as: "orderProducts"
+    }
+  },
+  {
+    $group: {
+      _id: "$_id",
+      name: { $first: "$name" },
+      orders: {
+        $push: {
+          orderId: "$userOrders._id",
+          products: "$orderProducts"
+        }
+      }
+    }
+  }
+])
+
+-------------------------------------------------------------------------
+-> Get user ahemd highest order price.
+
+  db.users.aggregate([
+  { $match: { name: "ahmed" } },
+  {
+    $lookup: {
+      from: "orders",
+      localField: "_id",
+      foreignField: "userId",
+      as: "userOrders"
+    }
+  },
+  { $unwind: "$userOrders" },
+  {
+    $lookup: {
+      from: "products",
+      localField: "userOrders.productsIds",
+      foreignField: "_id",
+      as: "orderProducts"
+    }
+  },
+  {
+    $unwind: "$orderProducts"
+  },
+  {
+    $group: {
+      _id: "$_id",
+      name: { $first: "$name" },
+      orders: {
+        $push: {
+          orderId: "$userOrders._id",
+          products: "$orderProducts"
+        }
+      }
+    }
+  },
+  {
+    $unwind: "$orders"
+  },
+  {
+    $unwind: "$orders.products"
+  },
+  {
+    $group: {
+      _id: "$_id",
+      name: { $first: "$name" },
+      maxPrice: { $max: "$orders.products.price" }
+    }
+  },
+   {
+    $project: {
+      _id: 0,
+      name: 1,
+      maxPrice: 1
+    }
+  }
+])
+-------------------------------------------------------------------------
+*/
